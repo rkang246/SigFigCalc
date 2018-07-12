@@ -1,4 +1,4 @@
 # SigFigCalc
-A significant figure calculator.
+A significant figure calculator- basically does everything a normal calculator does, except with sig figs rules in accordance to chemistry.
 
-Currently does not have a complete GUI.
+The GUI is still a work-in-progress.
