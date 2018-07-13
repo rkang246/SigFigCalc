@@ -269,9 +269,21 @@ public class SigFigCalc {
      * Postcondition: A string is returned representing the square root of d1 in accordance to sig fig rules
      */
     public String sqrt(String d1) {
-    	int toRound = countSigFigs(d1) + 1;
+    	int toRound = countSigFigs(d1);
     	return roundTo("" + (Math.sqrt(Double.parseDouble(d1))), toRound);
     }
-    	
+    
+    /** Finds the exponent of a number in accordance to significant figure rules
+     * 
+     * @param d1, the base
+     * @param d2, the power
+     * @return d1^d2, following significant figure rules
+     * Precondition: Both d1 and d2 are nonempty strings which can be parsed into a double
+     * Postcondition: A string is returned representing d1^d2 in accordance to sig fig rules
+     */
+    public String exp(String d1, String d2) {
+    	int toRound = countSigFigs(d1);
+    	return roundTo("" + (Math.pow(Double.parseDouble(d1), Double.parseDouble(d2))), toRound);
+    }
 
 }
