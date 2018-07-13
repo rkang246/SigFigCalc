@@ -1,4 +1,10 @@
-# SigFigCalc
-A significant figure calculator- basically does everything a normal calculator does, except with sig figs rules in accordance to chemistry.
+> A significant figure calculator written in java.
 
-The GUI is still a work-in-progress.
+## TO-DO
+
+- Implement use of negatives in the GUI
+- Implement square root
+- Implement ^-1
+- Add error messages (ex: overflow, divide by zero, et cetera)
+- Bug fixing
+- Write a README
