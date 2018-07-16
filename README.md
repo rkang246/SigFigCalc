@@ -1,4 +1,4 @@
-> A significant figure calculator written in java.
+> A significant figures calculator written in java.
 
 ## TO-DO
 
