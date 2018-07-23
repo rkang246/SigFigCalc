@@ -1,6 +1,7 @@
 import java.text.*;
 
-//Operations
+/**Operations
+ */
 
 public class SigFigCalc {
 	public SigFigCalc() {}
@@ -245,6 +246,9 @@ public class SigFigCalc {
      */
     public String multiply(String d1, String d2) {
     	int toRound = Math.min(countSigFigs(d1), countSigFigs(d2));
+    	if (Double.isInfinite(Double.parseDouble(d1) * Double.parseDouble(d2))) {
+    		return "Error: Overflow";
+    	}
     	return roundTo("" + (Double.parseDouble(d1) * Double.parseDouble(d2)), toRound);
     }
     
@@ -257,6 +261,9 @@ public class SigFigCalc {
      * Postcondition: A string is returned representing the quotient of d1 and d2 in accordance to sig fig rules
      */
     public String divide(String d1, String d2) {
+    	if (Double.parseDouble(d2) == 0) {
+    		return "Error: Divide by 0";
+    	}
     	int toRound = Math.min(countSigFigs(d1), countSigFigs(d2));
     	return roundTo("" + (Double.parseDouble(d1) / Double.parseDouble(d2)), toRound);
     }
@@ -269,6 +276,9 @@ public class SigFigCalc {
      * Postcondition: A string is returned representing the square root of d1 in accordance to sig fig rules
      */
     public String sqrt(String d1) {
+    	if (Double.parseDouble(d1) < 0) {
+    		return "Error: Nonreal answers";
+    	}
     	int toRound = countSigFigs(d1);
     	return roundTo("" + (Math.sqrt(Double.parseDouble(d1))), toRound);
     }
@@ -282,6 +292,12 @@ public class SigFigCalc {
      * Postcondition: A string is returned representing d1^d2 in accordance to sig fig rules
      */
     public String exp(String d1, String d2) {
+    	if (Double.parseDouble(d1) == 0 && d2.contains("-")) {
+    		return "Error: Divide by 0";
+    	}
+    	if (Double.isInfinite(Math.pow(Double.parseDouble(d1), Double.parseDouble(d2)))) {
+    		return "Error: Overflow";
+    	}
     	int toRound = countSigFigs(d1);
     	return roundTo("" + (Math.pow(Double.parseDouble(d1), Double.parseDouble(d2))), toRound);
     }
