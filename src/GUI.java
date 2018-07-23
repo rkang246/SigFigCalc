@@ -12,21 +12,11 @@ import javax.swing.UIManager;
 import javax.swing.SwingConstants;
 import java.awt.Component;
 import javax.swing.border.MatteBorder;
+import java.awt.Toolkit;
 
-/**
- * The GUI for the sig-fig calculator.
- * 
- * @author Robert Kang rkang246@gmail.com
- * @version 1.0 2018-08-13
- * 
- * @TODO:
- * 	Implement (-) negation sign
- * 	Implement operation based off the answer, supported by all 8 operations
- * 	Continuous Input, can continue w/o clicking equal sign
- * 	Error Messages (ex: overflow, divide by zero)
- *  Bug Fix
- * 
+/**GUI
  */
+
 public class GUI extends SigFigCalc {
 
 	/**
@@ -65,6 +55,7 @@ public class GUI extends SigFigCalc {
 	 */
 	private void initialize() {
 		frmSignificantFigureCalculator = new JFrame();
+		frmSignificantFigureCalculator.setIconImage(Toolkit.getDefaultToolkit().getImage(GUI.class.getResource("/javax/swing/plaf/metal/icons/ocean/computer.gif")));
 		frmSignificantFigureCalculator.getContentPane().setFont(new Font("Segoe UI", Font.PLAIN, 16));
 		frmSignificantFigureCalculator.setTitle("Significant Figure Calculator");
 		frmSignificantFigureCalculator.setBackground(Color.LIGHT_GRAY);
@@ -290,6 +281,7 @@ public class GUI extends SigFigCalc {
 				textField.setText("0");
 				operationField.setText("");
 				specialField.setText("");
+				textField.setFont(new Font("Segoe UI", Font.PLAIN, 60));
 			}
 		});
 		button_c.setBackground(Color.GRAY);
@@ -304,7 +296,7 @@ public class GUI extends SigFigCalc {
 		button_del.setToolTipText("Delete far right value");
 		button_del.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (!operationField.getText().contains("sf")&& !operationField.getText().contains("=")) {
+				if (!operationField.getText().contains("sf")&& !operationField.getText().contains("=") && !textField.getText().contains("Error")) {
 					if (textField.getText().length() == 1) {
 						textField.setText("0");
 					}
@@ -328,9 +320,13 @@ public class GUI extends SigFigCalc {
 		button_ce.setToolTipText("Clear Entry");
 		button_ce.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (!operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
+				if (!operationField.getText().contains("sf") && !operationField.getText().contains("=") && !textField.getText().contains("Error")) {
 					textField.setText("0");
 					specialField.setText("");
+				}
+				if (operationField.getText().contains("sf")) {
+					specialField.setText("");
+					operationField.setText("");
 				}
 			}
 		});
@@ -346,9 +342,15 @@ public class GUI extends SigFigCalc {
 		 * Operations
 		 */
 		JButton button_subtract = new JButton("-");
-		button_subtract.setToolTipText("Subtract");
+		button_subtract.setToolTipText("Subtract or Negate");
 		button_subtract.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				//
+				if (textField.getText().equals("0")) {
+					typeIn("-");
+				}
+				else
+				//
 				prepareOperation(button_subtract.getText());
 			}
 		});
@@ -463,7 +465,8 @@ public class GUI extends SigFigCalc {
 		btnCountSf.setToolTipText("Count Sig Figs");
 		btnCountSf.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (operationField.getText().equals("")) {
+				if ((operationField.getText().equals("") || operationField.getText().contains("=")) && !textField.getText().contains("Error")) {
+					specialField.setText("");
 					operationField.setText(countSigFigs(textField.getText()) + " sf");
 				}
 			}
@@ -482,27 +485,33 @@ public class GUI extends SigFigCalc {
 		JButton button_equal = new JButton("=");
 		button_equal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (!operationField.getText().contains("=")) {
+				if (!operationField.getText().contains("=") && !operationField.getText().contains("sf") && !textField.getText().equals("-") && !operationField.getText().equals("")) {
 					String entry1 = operationField.getText().substring(0,  operationField.getText().length() - 1);
 					String entry2 = textField.getText();
 					String operation = operationField.getText().substring(operationField.getText().length() - 1);
 					operationField.setText(entry1 + operation + entry2 + "=");
 					
+					String toSet = "";
 					if (operation.equals("+")) {
-						textField.setText(add(entry1, entry2));
+						toSet = add(entry1, entry2);
 					}
 					else if (operation.equals("-")) {
-						textField.setText(subtract(entry1, entry2));
+						toSet = subtract(entry1, entry2);
 					}
 					else if (operation.equals("x")) {
-						textField.setText(multiply(entry1, entry2));
+						toSet = multiply(entry1, entry2);
 					}
 					else if (operation.equals("/")) {
-						textField.setText(divide(entry1, entry2));
+						toSet = divide(entry1, entry2);
 					}
 					else if (operation.equals("^")) {
-						textField.setText(exp(entry1, entry2));
+						toSet = exp(entry1, entry2);
 					}
+					
+					if (toSet.contains("Error")) {
+						textField.setFont(new Font("Segoe UI", Font.PLAIN, 32));
+					}
+					textField.setText(toSet);
 				}
 				
 			}
@@ -523,20 +532,22 @@ public class GUI extends SigFigCalc {
 	 * Includes numbers and the decimal point.
 	 */
 	public void typeIn(String value) {
-		if (value.equals("0")) {
-			if (!textField.getText().equals("0") && !operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
-				String enterNumber = textField.getText() + value;
-				textField.setText(enterNumber);
-			}
-		}
-		else {
-			if (textField.getText().equals("0") && !value.equals(".") && !operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
-				textField.setText(null);
-			}
-			if (!operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
-				if ((value.equals(".") && !textField.getText().contains(".")) || !value.equals(".")) {
+		if (!textField.getText().contains("Error")) {
+			if (value.equals("0")) {
+				if (!textField.getText().equals("0") && !operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
 					String enterNumber = textField.getText() + value;
 					textField.setText(enterNumber);
+				}
+			}
+			else {
+				if (textField.getText().equals("0") && !value.equals(".") && !operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
+					textField.setText(null);
+				}
+				if (!operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
+					if ((value.equals(".") && !textField.getText().contains(".")) || (value.equals("-") && !textField.getText().contains("-")) || (!value.equals(".") && !value.equals("-"))) {
+						String enterNumber = textField.getText() + value;
+						textField.setText(enterNumber);
+					}
 				}
 			}
 		}
@@ -547,24 +558,46 @@ public class GUI extends SigFigCalc {
 	 * Is used by +, -, /, x, ^
 	 */
 	public void prepareOperation(String op) {
-		if (operationField.getText().equals("")) {
-			operationField.setText(textField.getText() + op);
-			textField.setText("0");
-			specialField.setText("");
+		if (!textField.getText().contains("Error")) {
+			if (operationField.getText().equals("") && !textField.getText().equals("-")) {
+				operationField.setText(textField.getText() + op);
+				textField.setText("0");
+				specialField.setText("");
+			}
+			else if (operationField.getText().contains("=")) {
+				operationField.setText(textField.getText() + op);
+				textField.setText("0");
+				specialField.setText("");
+			}
 		}
+			
 	}
 
 	/**
 	 * Instant Operations
 	 */
 	public void instantOp(String op) {
-		if (op.equals("inv")) {
-			specialField.setText("1/x");
-			textField.setText(exp(textField.getText(), "-1"));
+		//if (!operationField.getText().contains("sf") && !operationField.getText().contains("=")) {
+		if (!operationField.getText().contains("sf") && !textField.getText().contains("Error")) {
+			String toSet = textField.getText();
+			if (op.equals("inv")) {
+				specialField.setText("1/x");
+				toSet = exp(textField.getText(), "-1");
+			}
+			if (op.equals("sqrt")) {
+				specialField.setText("\u221A");
+				toSet = sqrt(textField.getText());
+			}
+			
+			if (operationField.getText().contains("=")) {
+				operationField.setText("");
+			}
+			
+			if (toSet.contains("Error")) {
+				textField.setFont(new Font("Segoe UI", Font.PLAIN, 32));
+			}
+			textField.setText(toSet);
 		}
-		if (op.equals("sqrt")) {
-			specialField.setText("\u221A");
-			textField.setText(sqrt(textField.getText()));
-		}
+		
 	}
 }
