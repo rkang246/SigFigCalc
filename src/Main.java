@@ -3,7 +3,7 @@
  * Built using Eclipse Window Builder
  * 
  * @author Robert Kang rkang246@gmail.com
- * @version 1.0 2018-08-16
+ * @version 1.0 2018-07-16
  * 
  * @TODO:
  *  Bug Fixing
